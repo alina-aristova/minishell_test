@@ -44,45 +44,115 @@ char    *arrstrs_addback(char ***arr, char *s)
 	*arr = res;
 	return(s);
 }
+int is_separator(char c)
+{
+	if(c == ' ' || c == ';' || c == '>' || c == '<' || c == '|' )
+		return(1);
+	return(0);
+}
+int is_q(char c)
+{
+	if(c == '\'')
+		return(1);
+	return(0);
+}
 
+int shell_count_strs(char *str)
+{
+	int start = 0;
+	int finish = 0;
+	int i = 0;
+	while(str[start])
+	{
+		if(is_q(str[finish]))
+		{
+			finish++;
+			while(!is_q(str[finish]))
+				finish++;
+			if(is_separator(str[finish+1]))
+			{
+				i++;
+				finish++;
+				start = finish;
+			}
+			finish++;
+		}
+		else if(is_separator(str[finish]) || str[finish] == '\0' )
+		{
+			i++;
+			while(is_separator(str[finish]))
+			{
+				if((str[finish] == '>' || str[finish] == '<'))
+					i++;
+				if((str[finish] == '|' || str[finish] == ';'))
+					i++;
+				finish++;
+			}
+			start = finish;
+		}
+		else
+			finish++;
+		}
+	return(i);
+}
 int main()
 {
 	char *str;
 	int start = 0;
 	int finish = 0;
 	char **str1;
-	str1 = (char**)malloc(sizeof(char**)*20);
-		int i = 0;
-	str = "ls -la -ls | cat>  ~;  d<    a      > dfg";
+	
+	int i = 0;
+	str = "\'e\'\'c      \'\'h\'\'o\' -la -ls\'|\' cat>\';  d<    a\'\' > \'dfg ";
+	int count = shell_count_strs(str);
+	str1 = (char**)malloc(sizeof(char**)*(count + 1));
 	while(str[start])
 	{
-		
-		//printf("str[finish] --> |%c|\n",str[finish]);
-		if((str[finish] == ' ' || str[finish] == '>' || str[finish] == '<' || str[finish] == '\0'))
+		if(is_q(str[finish]))
 		{
-			
-			//printf("str[finish] --> |%c|\n",str[finish]);
-			//printf("|%d|<--->|%d|",start,finish);
-			str1[i] = ft_substr(str,start,finish - start);
+			finish++;
+			while(!is_q(str[finish]))
+				finish++;
+			if(is_separator(str[finish+1]))
+			{
+				str1[i] = ft_substr(str,start,finish - start + 1);
+				i++;
+				finish++;
+				start = finish;
+			}
+			finish++;
+			//start = finish;
+			//finish++;
+		}
+		else if(is_separator(str[finish]) || str[finish] == '\0' )
+		{
+			str1[i] = ft_substr(str,start+1,finish - start -1);
 			i++;
 			
-			while(str[finish] == ' ' || str[finish] == '>' || str[finish] == '<')
+			while(is_separator(str[finish]))
 			{
 				if((str[finish] == '>' || str[finish] == '<'))
 				{
 					str1[i] = str[finish] == '>' ? ft_strdup(">") : ft_strdup("<");
 					i++;
 				}
+				if((str[finish] == '|' || str[finish] == ';'))
+				{
+					str1[i] = str[finish] == '|' ? ft_strdup("|") : ft_strdup(";");
+					i++;
+				}
 				finish++;
 			}
+			//finish++;
 			start = finish;
-			
+			//finish++;
 		}
-		
-		finish++;
+		else
+			finish++;
+		//finish++;
 	}
 	str1[i] = NULL;
-	
+	printf("count--->|%d|\n",count);
 	while(*str1)
 	{
 		printf("|%s|\n",*str1++);

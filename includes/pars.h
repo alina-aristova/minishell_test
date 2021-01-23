@@ -13,11 +13,12 @@ typedef struct	s_reds
 
 typedef struct	s_shell
 {
-	char	*command;
+
 	char	**argv;
 	t_reds 	*reds_right;
 	t_reds 	*reds_left;
-	int		pipe;
+	int output;
+	int input;
 	
 }				t_shell;
 typedef struct	s_flgs
