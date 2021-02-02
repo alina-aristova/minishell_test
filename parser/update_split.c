@@ -7,38 +7,12 @@ static char		*ft_make_new_substr(char const *start, char const *end)
 	char *tmp;
 	int i = 0;
 	int flg = 0;
-	// while (start[i] != end[i])
-	// {
-	// 	if(*start == '\'')
-	// 		i++;
-	// 	if(*start == '\"')
-	// 		i++;
-	// 	i++;
-	// // }
-	// printf("start---> %s\n",start);
-	// printf("*end---> %s\n",end);
-	substr = (char *)malloc((i) + 2);
+
+	substr = (char *)malloc((end - start) + 2);
 	tmp = substr;
 	
 	while (start != end)
 	{
-		// if(*start == '\'' && flg == 1)
-		// 	start++;
-		// if(*start == '\"'&& flg == 2)
-		// 	start++;
-		// if (flg == 0)
-		// {
-		// 	if(*start == '\'')
-		// 	{
-		// 		start++;
-		// 		flg = 1;
-		// 	}
-		// 	if(*start == '\"')
-		// 	{
-		// 		start++;
-		// 		flg = 2;
-		// 	}
-		// }
 		*substr = *start;
 		substr++;
 		start++;
@@ -55,18 +29,14 @@ char *skip_line(char *s,char c)
 		if(*s == '\'')
 		{
 			s++;
-			while(*s != '\'')
+			while(*s != '\''&&*s != '\0')
 				s++;
-			//if(*(s+1) != '\0')	
-			//	s++;
 		}
 		if(*s == '\"')
 		{
 			s++;
-			while(*s != '\"')
+			while(*s != '\"' &&*s != '\0' )
 				s++;
-			//if(*(s+1) != '\0')	
-				//s++;
 		}
 		s++;
 	}
@@ -83,7 +53,8 @@ static int	ft_count_strs(char const *s1, char c)
 		if(*s != c || *s != '\0')
 			s = skip_line(s,c);
 		count++;
-		s++;
+		if(*s != '\0')
+			s++;
 	}
 	return (count);
 }
@@ -99,7 +70,7 @@ static char		**ft_clean_if_fail(char **s, size_t last_word)
 	return (NULL);
 }
 
-char			**ft_split(char const *s, char c)
+char			**update_split(char const *s, char c)
 {
 	char			**res;
 	const char		*tmp;
@@ -122,24 +93,18 @@ char			**ft_split(char const *s, char c)
 		{
 			if(s[i] == '\'')
 			{
-				tmp++;
 				i++;
 				while(s[i] != '\'')
 					i++;
-				//i++;
 			}
 			if(s[i] == '\"')
 			{
-				tmp++;
 				i++;
 				while(s[i] != '\"')
 					i++;
-				//i++;
 			}
 			i++;
 		}
-		
-		
 		res[current_word] = ft_make_new_substr(tmp, &s[i]);
 		if (res[current_word++] == NULL)
 			return (ft_clean_if_fail(res, current_word - 1));
@@ -147,17 +112,16 @@ char			**ft_split(char const *s, char c)
 	res[current_word] = NULL;
 	return (res);
 }
-#include<stdio.h>
-int main()
-{
-	int r = ft_count_strs("\'123\";\";456\'\\;\';\'789",';');
-	printf("%d\n",r);
-	char **s;
-	int i = 0;
-	s = ft_split("\'123\';456;789 ",';');
-	while(s[i])
-	{
-		printf("|%s|\n",s[i]);
-		i++;
-	}
-}
+
+// #include<stdio.h>
+// int main()
+// {
+// 	char **s;
+// 	int i = 0;
+// 	s = update_split("'e''c'ho a > qw|echo b>qwerty|'c'a't' -e ; 'e''c'ho a > qw| echo b>qwerty | 'c'a't' -e                ",';');
+// 	while(s[i])
+// 	{
+// 		printf("|%s|\n",s[i]);
+// 		i++;
+// 	}
+// }

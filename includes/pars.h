@@ -24,11 +24,19 @@ typedef struct	s_shell
 typedef struct	s_flgs
 {
 	int flg_two;
+	int *len_right_r;
+	int *en_left_r;
+	int count_sem;
+	int *count_pipe;
+
 	int flg_one;
 }			t_flgs;
 typedef struct	s_all
 {
+	t_shell **shell;
 	t_flgs flgs;
 }			t_all;
+
+char			**update_split(char const *s, char c);
 
 #endif

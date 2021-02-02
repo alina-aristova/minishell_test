@@ -6,7 +6,7 @@
 /*   By: acase <acase@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/18 10:51:30 by acase             #+#    #+#             */
-/*   Updated: 2021/01/18 14:50:17 by acase            ###   ########.fr       */
+/*   Updated: 2021/01/28 13:43:38 by acase            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,10 @@ static void singl_quote(char *str, t_flgs *flg)
 		if(flg->flg_two == 0)
 			flg->flg_one = 1;
 		else
-			return;
-		
+			return;	
 	}
 	else
-		flg->flg_one = 0;
-	
-	
-	
+		flg->flg_one = 0;	
 }		
 
 static void double_quote(char *str, t_flgs *flg)
