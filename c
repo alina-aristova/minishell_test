@@ -1,14 +1,1 @@
--la
-CMakeLists.txt
-Makefile
-README.md
-a
-b
-build-in_functions
-c
-d
-envp
-includes
-libft
-main.c
-parser
+dfvergrtgrtg

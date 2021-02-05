@@ -5,18 +5,12 @@
 #define TRUE 1
 #define FALSE 0
 #define ERROR -1
-typedef struct	s_reds
-{
-	int		flg;
-	char	*red;
-}				t_reds;
+
 
 typedef struct	s_shell
 {
 
 	char	**argv;
-	t_reds 	*reds_right;
-	t_reds 	*reds_left;
 	int output;
 	int input;
 	
@@ -33,7 +27,7 @@ typedef struct	s_flgs
 }			t_flgs;
 typedef struct	s_all
 {
-	t_shell **shell;
+	t_shell *shell;
 	t_flgs flgs;
 }			t_all;
 

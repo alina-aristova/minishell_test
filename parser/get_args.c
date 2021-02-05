@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../includes/pars.h"
-
+#include <unistd.h>
 #include <stdio.h>
 void clear_2d_arr(char **arr)
 {
@@ -227,16 +227,12 @@ char **cat_string(char *str)
 	return(str1);
 	
 }
-// void init_params(t_all *all)
-// {
-// 	all->shell.argv = NULL;
 
-// }
 int empty_line(char *str)
 {
 	if(!str)
-		return(FALSE);
-	if(ft_strlen(str)== 0)
+		return(TRUE);
+	if(ft_strlen(str) == 0)
 		return(TRUE);
 	return(FALSE);
 }
@@ -245,50 +241,138 @@ void count_semicolon(t_all *all, char **str)
 {
 	all->flgs.count_sem = size_of_2d_array(str);
 }
-
-void check_count_pipe(t_all *all, char ***str)
+int is_redirectoin(char * str)
 {
-	int i;
-	i = 0;
-
-	all->flgs.count_pipe = (int*)malloc(all->flgs.count_sem * sizeof(int));
+	if(!ft_memcmp(str,">",2) || !ft_memcmp(str,"<",2) 
+	|| !ft_memcmp(str,">>",3))
+		return(TRUE);
+	return(FALSE);
+}
+char **refactor_str(char **str)
+{
+	int count;
+	int i = 0;
+	count = 0;
+	int j;
 	while(str[i])
 	{
-		all->flgs.count_pipe[i] = size_of_2d_array(str[i]);
-		i++;
-	}	
-}
-void get_args(t_all *all, char **str)
-{
-
-	int i = 0;
-	while(str && *str)
-	{
-
-		printf("%s\n",   str[i]);
+		if(ft_strlen(str[i])!= 0)
+		{	count++;
+			//printf("%d,,,%s\n",count,str[i]);
+			//printf("%d\n",str[i]);
+			}
 		i++;
 	}
-	// {
-	// 	if(!empty_line(*str))
-	// 	{
-	// 			if(!ft_memcmp(*str,">",1))
-	// 			{
-	// 				(*str)++;
-	// 			}
-	// 			else if(!ft_memcmp(*str,"<",1))
-	// 				(*str)++;
-	// 			else if(!ft_memcmp(*str,">>",2))
-	// 				(*str)++;
-	// 			else
-	// 			{
-	// 				arrstrs_addback((&(all->shell[0][0].argv)),*str);
-	// 				(*str)++;
-	// 			}
-	// 	}
-	// 	else
-	// 	(*str)++;	
-	// }
+	j= 0;
+	i = 0;
+	char **stres = malloc((count + 1)*(sizeof(char*)));
+	while(str[i])
+	{
+		if(ft_strlen(str[i])!= 0)
+		{	stres[j] = str[i];
+			j++;
+			//printf("%d,,,%s\n",count,str[i]);
+			//printf("%d\n",str[i]);
+			}
+		i++;
+	}
+	stres[j] = NULL;
+	return(stres);
+}
+void fill_struct(t_shell *shell, char *str, int len)
+{
+	char **str_args;
+	int i = 0;
+
+	str_args = cat_string(str);
+	str_args = refactor_str(str_args);
+	shell[len].argv = malloc(100);
+	while(str_args[i])
+	{
+		//
+		//printf("%s\n",str_args[i]);
+		//printf("%s\n",str_args[i-1]);
+		// if(empty_line(str_args[i]))
+		// 	i++;
+	//	if(!empty_line(str_ar=gs[i]))
+		//{
+			if (i == 0)
+			{
+				//printf("%d\n",i);
+				if((!is_redirectoin(str_args[i])))
+				{
+				//	printf("%s\n",str_args[i]);
+					shell[len].argv[i] = str_args[i];
+				}
+			}
+			else if((!is_redirectoin(str_args[i]) && !is_redirectoin(str_args[i - 1])))
+			{
+				//printf("%s\n",str_args[i]);
+				shell[len].argv[i] = str_args[i];
+				//i++;
+			}
+			//printf("%s\n",str_args[i]);
+			
+			
+	//	}
+		i++;
+	}
+		shell[len].argv[i] = NULL;
+		i = 0;
+		
 	
+}
+void init_shell_structs(t_shell *shell, int size)
+{
+	int i = 0;
+	while(i < size)
+	{
+		shell[i].argv = NULL;
+		shell[i].input = 1;
+		shell[i].output = 0;
+
+		
+		i++;	
+	}
+}
+int red_between_pipes(t_shell *shell, int len)
+{
+	int i = 0;
+	int pipes[2];
+	while(i < len - 1)
+	{
+		if (pipe(pipes) < 0)
+			return (-1);
+		shell[i + 1].input = pipes[0];
+		shell[i].output= pipes[1];
+		i++;
+	}
+	return(0);
+
+}
+t_all *get_args(t_all *all, char *str)
+{
+	char **str_pipe;
+	int size_arr;
+	int i ;
+
+	i = 0;
+	str_pipe = update_split(str,'|');
+	size_arr = size_of_2d_array(str_pipe);
+	all->shell = malloc((size_arr) * sizeof(t_shell));
+	//all->shell[size_arr] = NULL;
+	init_shell_structs(all->shell,size_arr);
+
+	red_between_pipes(all->shell, size_arr);
+	while(i < size_arr)
+	{
+		fill_struct(&(all->shell[i]),str_pipe[i], i);
+		i++;
+
+	}
+	i = 0;
+	
+	return(all);
 }
 int main()
 {
@@ -299,14 +383,26 @@ int main()
 	i = 0;
 	int j;
 	int k = 0;
-	//int i = 0;
-	s = update_split("'e''c'ho a > qw|echo b>qwerty|'c'a't' -e ; 'e''c'ho a > qw| echo b>qwerty | 'c'a't' -e                ",';');
-	//char **str_res = cat_string("\'e\'\'c\'ho a > qw|echo b>qwerty|'c'a't' -e ; \'e\'\'c\'ho a > qw| echo b>qwerty | 'c'a't' -e                ");
+
+	s = update_split(" ls -la 'e''c'ho a > qw|echo b>qwerty|'c'a't' -e ; 'e''c'ho c > qw| echo qwe>qwerty | 'c'a't' -e                ",';');
 	count_semicolon(&all, s);
-	//s_pipe = (char***)(malloc(sizeof(char**) * (all.flgs.count_sem + 1) ));
+
 	while(s[i])
 	{
-		//s_pipe[i] = update_split(s[i],'|');
+		all = *get_args(&all, s[i]);
+		
+		//вызываем команды
+		i++;
+	}
+	i = 0;
+	while(i < 3)
+	{
+		j = 0;
+		while(all.shell[i].argv[j])
+		{
+			fprintf(stderr, "|shell[i]: %d|argv[j]: %d|input: %d|output: %d|arg: %s|\n",i,j,all.shell[i].input, all.shell[i].output,all.shell[i].argv[j]);
+			j++;
+		}
 		i++;
 	}
 }
