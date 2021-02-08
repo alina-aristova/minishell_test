@@ -3,6 +3,7 @@
 #include "../includes/pars.h"
 #include <unistd.h>
 #include <stdio.h>
+# include <fcntl.h>
 void clear_2d_arr(char **arr)
 {
 	int i;
@@ -257,10 +258,14 @@ char **refactor_str(char **str)
 	while(str[i])
 	{
 		if(ft_strlen(str[i])!= 0)
+<<<<<<< HEAD
+			count++;	
+=======
 		{	count++;
 			//printf("%d,,,%s\n",count,str[i]);
 			//printf("%d\n",str[i]);
 			}
+>>>>>>> 3d146889a82eb4be5d1e3c9808a80b30eaba1637
 		i++;
 	}
 	j= 0;
@@ -269,6 +274,52 @@ char **refactor_str(char **str)
 	while(str[i])
 	{
 		if(ft_strlen(str[i])!= 0)
+<<<<<<< HEAD
+		{	stres[j] = ft_strdup(str[i]);
+			j++;
+		}
+		i++;
+	}
+	stres[j] = NULL;
+	//free(str);
+	return(stres);
+}
+int count_red(char **str)
+{
+	int i = 0;
+	while(*str)
+	{
+		if(is_redirectoin(*str))
+		{
+			i++;
+		} 
+		str++;
+	}
+	return(i);
+} 
+char **fill_struct(t_shell *shell, char *str, int len)
+{
+	char **str_args;
+	char **str_args1;
+	int i = 0;
+	int count;
+	
+	str_args1 = cat_string(str);
+	str_args = refactor_str(str_args1);
+	clear_2d_arr(str_args1);
+	count = size_of_2d_array(str_args) - 2 * count_red(str_args);
+	printf("count args %d\n",count);
+	shell[len].argv = malloc((count + 1)*sizeof(char*));
+	while(str_args[i])
+	{
+
+			if (i == 0)
+			{
+				if((!is_redirectoin(str_args[i])))
+				{
+					shell[len].argv[i] = str_args[i];
+					printf("|%s|%d|%d\n",shell[len].argv[i],i,len);
+=======
 		{	stres[j] = str[i];
 			j++;
 			//printf("%d,,,%s\n",count,str[i]);
@@ -303,10 +354,23 @@ void fill_struct(t_shell *shell, char *str, int len)
 				{
 				//	printf("%s\n",str_args[i]);
 					shell[len].argv[i] = str_args[i];
+>>>>>>> 3d146889a82eb4be5d1e3c9808a80b30eaba1637
 				}
 			}
 			else if((!is_redirectoin(str_args[i]) && !is_redirectoin(str_args[i - 1])))
 			{
+<<<<<<< HEAD
+				shell[len].argv[i] = str_args[i];
+				printf("|%s|%d|%d\n",shell[len].argv[i],i,len);
+
+			}
+		i++;
+	}
+	shell[len].argv[i] = NULL;
+		i = 0;
+	//clear_2d_arr(str_args1);	
+	return(str_args);
+=======
 				//printf("%s\n",str_args[i]);
 				shell[len].argv[i] = str_args[i];
 				//i++;
@@ -321,6 +385,7 @@ void fill_struct(t_shell *shell, char *str, int len)
 		i = 0;
 		
 	
+>>>>>>> 3d146889a82eb4be5d1e3c9808a80b30eaba1637
 }
 void init_shell_structs(t_shell *shell, int size)
 {
@@ -330,12 +395,20 @@ void init_shell_structs(t_shell *shell, int size)
 		shell[i].argv = NULL;
 		shell[i].input = 1;
 		shell[i].output = 0;
+<<<<<<< HEAD
+		printf("i: |%d| shell[i].input: |%d| shell[i].output: |%d|\n",i, shell[i].input, shell[i].output);
+		i++;	
+	}
+}
+int pipes(t_shell *shell, int len)
+=======
 
 		
 		i++;	
 	}
 }
 int red_between_pipes(t_shell *shell, int len)
+>>>>>>> 3d146889a82eb4be5d1e3c9808a80b30eaba1637
 {
 	int i = 0;
 	int pipes[2];
@@ -344,6 +417,53 @@ int red_between_pipes(t_shell *shell, int len)
 		if (pipe(pipes) < 0)
 			return (-1);
 		shell[i + 1].input = pipes[0];
+<<<<<<< HEAD
+		shell[i].output = pipes[1];
+		printf("pipes[0]:|%d| pipes[1]:|%d|\n",pipes[0],pipes[1]);
+		printf("i: |%d| shell[i + 1].input: |%d| shell[i].output: |%d|\n",i, shell[i + 1].input, shell[i].output);
+		i++;	
+		//i++;
+	}
+	return(0);
+}
+
+int redirection(t_shell *shell, char **str, int len)
+{
+	int i = 0;
+	int fd = 0;
+	while(str[i])
+	{
+		if(!memcmp(str[i],">",2))
+		{
+			if ((fd =  open(str[i + 1], O_CREAT | O_WRONLY | O_TRUNC,
+								0644)) < 0)
+								return(ERROR);
+			if(shell->output != 0)
+				close(shell->output);
+			shell->output = fd;
+			i++;
+			
+		}
+		if(!memcmp(str[i],">>",3))
+		{
+			if ((fd =  open(str[i + 1], O_CREAT | O_WRONLY | O_APPEND,
+								0644)) < 0)
+								return(ERROR);
+			if(shell->output != 0)
+				close(shell->output);
+			shell->output = fd;
+			i++;
+		}
+		if(!memcmp(str[i],"<",2))
+		{
+			if ((fd =  open(str[i + 1],  O_RDONLY )) < 0)
+								return(ERROR);
+			if(shell->input != 1)
+				close(shell->input);
+			shell->output = fd;
+			i++;	
+		}
+=======
 		shell[i].output= pipes[1];
 		i++;
 	}
@@ -367,12 +487,38 @@ t_all *get_args(t_all *all, char *str)
 	while(i < size_arr)
 	{
 		fill_struct(&(all->shell[i]),str_pipe[i], i);
+>>>>>>> 3d146889a82eb4be5d1e3c9808a80b30eaba1637
 		i++;
 
 	}
+<<<<<<< HEAD
+	return(TRUE);
+}
+void get_args(t_all *all, char *str)
+{
+	char **str_pipe;
+	int size_arr;
+	int i ;
+	char **res_fill;
+	i = 0;
+	str_pipe = update_split(str,'|');
+	size_arr = size_of_2d_array(str_pipe);
+	all->shell = malloc((size_arr) * sizeof(t_shell));
+	init_shell_structs(all->shell, size_arr);
+	pipes(all->shell, size_arr);
+	while(i < size_arr)
+	{
+		res_fill = fill_struct(&(all->shell[i]),str_pipe[i], i);
+		redirection(&(all->shell[i]),res_fill, i);
+		///clear_2d_arr(res_fill);
+		i++;
+	}
+	clear_2d_arr(str_pipe);
+=======
 	i = 0;
 	
 	return(all);
+>>>>>>> 3d146889a82eb4be5d1e3c9808a80b30eaba1637
 }
 int main()
 {
@@ -387,6 +533,17 @@ int main()
 	s = update_split(" ls -la 'e''c'ho a > qw|echo b>qwerty|'c'a't' -e ; 'e''c'ho c > qw| echo qwe>qwerty | 'c'a't' -e                ",';');
 	count_semicolon(&all, s);
 
+<<<<<<< HEAD
+	ft_bzero(&all, sizeof(t_all));
+	while(s[i])
+	{
+		
+		get_args(&all, s[i]);
+		//вызываем команды
+		
+		//clear_2d_arr(all.shell->argv);
+		//free(all.shell);
+=======
 	while(s[i])
 	{
 		all = *get_args(&all, s[i]);
@@ -403,6 +560,11 @@ int main()
 			fprintf(stderr, "|shell[i]: %d|argv[j]: %d|input: %d|output: %d|arg: %s|\n",i,j,all.shell[i].input, all.shell[i].output,all.shell[i].argv[j]);
 			j++;
 		}
+>>>>>>> 3d146889a82eb4be5d1e3c9808a80b30eaba1637
 		i++;
 	}
+	i = 0;
+	clear_2d_arr(s);
+	//sleep(100);
+
 }
