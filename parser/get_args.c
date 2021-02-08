@@ -444,6 +444,6 @@ int main()
 	}
 	i = 0;
 	clear_2d_arr(s);
-	sleep(100);
+	//sleep(100);
 
 }
